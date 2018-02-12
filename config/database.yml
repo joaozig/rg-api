@@ -11,6 +11,6 @@ development:
 production:
   <<: *default
   host: <%= ENV['PETLIG_DATABASE_HOST'] %>
-  database: <%= ENV['PETLIG_DATABASE_NAME'] %>
-  username: <%= ENV['PETLIG_DATABASE_USERNAME'] %>
-  password: <%= ENV['PETLIG_DATABASE_PASSWORD'] %>
+  database: <%= ENV['RG_DATABASE_NAME'] %>
+  username: <%= ENV['RG_DATABASE_USERNAME'] %>
+  password: <%= ENV['RG_DATABASE_PASSWORD'] %>
