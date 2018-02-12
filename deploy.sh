@@ -48,8 +48,6 @@ if [ "$ENV" ==  "staging" ]; then
   RG_AWS_REGION=$STAGING_RG_AWS_REGION
   RG_AWS_UPLOADS_BUCKET=$STAGING_RG_AWS_UPLOADS_BUCKET
   RG_AWS_UPLOADS_BASE_URL=$STAGING_RG_AWS_UPLOADS_BASE_URL
-  RG_AWS_APNS_SNS_ARN=$STAGING_RG_AWS_APNS_SNS_ARN
-  RG_AWS_GCM_SNS_ARN=$STAGING_RG_AWS_GCM_SNS_ARN
 fi
 
 if [ "$ENV" ==  "development" ]; then
@@ -75,14 +73,15 @@ if [ "$ENV" ==  "development" ]; then
   RG_AWS_REGION=$DEV_RG_AWS_REGION
   RG_AWS_UPLOADS_BUCKET=$DEV_RG_AWS_UPLOADS_BUCKET
   RG_AWS_UPLOADS_BASE_URL=$DEV_RG_AWS_UPLOADS_BASE_URL
-  RG_AWS_APNS_SNS_ARN=$DEV_RG_AWS_APNS_SNS_ARN
-  RG_AWS_GCM_SNS_ARN=$DEV_RG_AWS_GCM_SNS_ARN
 fi
 
 
 deploy_image() {
+  echo "deploying image - login"
   `aws ecr get-login`
+  echo "deploying image - docker tag"
   docker tag $DOCKER_IMAGE:$VERSION $DOCKER_REGISTRY/$DOCKER_IMAGE:$VERSION$TAG_SUFFIX
+  echo "deploying image - docker push"
   docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:$VERSION$TAG_SUFFIX
 }
 
@@ -113,9 +112,7 @@ create_task_definition() {
                   { "name": "RG_AWS_SECRET_ACCESS_KEY",        "value": "'$RG_AWS_SECRET_ACCESS_KEY'" },
                   { "name": "RG_AWS_REGION",                   "value": "'$RG_AWS_REGION'" },
                   { "name": "RG_AWS_UPLOADS_BUCKET",           "value": "'$RG_AWS_UPLOADS_BUCKET'" },
-                  { "name": "RG_AWS_UPLOADS_BASE_URL",         "value": "'$RG_AWS_UPLOADS_BASE_URL'" },
-                  { "name": "RG_AWS_APNS_SNS_ARN",             "value": "'$RG_AWS_APNS_SNS_ARN'" },
-                  { "name": "RG_AWS_GCM_SNS_ARN",              "value": "'$RG_AWS_GCM_SNS_ARN'" }
+                  { "name": "RG_AWS_UPLOADS_BASE_URL",         "value": "'$RG_AWS_UPLOADS_BASE_URL'" }
               ]
             }
             ],
@@ -252,6 +249,7 @@ create_or_update_service() {
 
 deploy_server() {
   # curl -X POST -H 'Content-Type: application/json' --data "{ 'text': 'Starting $DOCKER_IMAGE deployment in $ENV.' }" $SLACK_URL
+  echo "creating server"
   create_task_definition
   create_or_update_service
 }
