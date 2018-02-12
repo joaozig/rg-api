@@ -1,0 +1,35 @@
+# circle.yml
+machine:
+  python:
+    version: 2.7.10
+  services:
+    - docker
+
+dependencies:
+  override:
+    - pip install awscli
+    - curl -L -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5rc1/jq-linux-x86_64-static && chmod +x ~/bin/jq
+    - docker build -t recifegourmet-api:`cat VERSION` .
+    - docker tag recifegourmet-api:`cat VERSION` recifegourmet_sidekiq:latest
+
+database:
+  override:
+    - echo "Skip database setup"
+
+test:
+  override:
+    - echo "Skip tests"
+
+deployment:
+  production:
+    tag: /[0-9]+(\.[0-9]+)+/
+    commands:
+      - ./deploy.sh production `cat VERSION`
+  staging:
+    tag: /[0-9]+(\.[0-9]+)+(-rc[0-9]+)/
+    commands:
+      - ./deploy.sh staging `cat VERSION`
+  dev:
+    branch: develop
+    commands:
+      - ./deploy.sh development `cat VERSION`
