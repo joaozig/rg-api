@@ -77,11 +77,8 @@ fi
 
 
 deploy_image() {
-  echo "deploying image - login"
   `aws ecr get-login`
-  echo "deploying image - docker tag"
   docker tag $DOCKER_IMAGE:$VERSION $DOCKER_REGISTRY/$DOCKER_IMAGE:$VERSION$TAG_SUFFIX
-  echo "deploying image - docker push"
   docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:$VERSION$TAG_SUFFIX
 }
 
